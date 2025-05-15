@@ -17,10 +17,8 @@ ENV KONG_ADMIN_ERROR_LOG=/dev/stderr
 # Exponer puertos
 EXPOSE 8000 8443 8001 8444
 
-# Opción A: con entrypoint oficial
-ENTRYPOINT ["sh","-c","kong migrations bootstrap && /docker-entrypoint.sh kong docker-start"]
 
-# — o bien —
+
 
 # Opción B: sin entrypoint oficial, usando `kong start`
-# ENTRYPOINT ["sh","-c","kong migrations bootstrap && kong start"]
+ENTRYPOINT ["sh","-c","kong migrations bootstrap && kong start"]
