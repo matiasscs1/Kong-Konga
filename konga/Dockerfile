@@ -1,13 +1,26 @@
-# Usa la imagen oficial de Konga
-FROM pantsel/konga:latest
+FROM kong:3.6
 
-# Modo producción y Postgres externo
-ENV NODE_ENV=production
-ENV DB_ADAPTER=postgres
-ENV DB_URI=${DB_URI}
+# Configuración de Postgres en Render
+ENV KONG_DATABASE=postgres
+ENV KONG_PG_HOST=${KONG_PG_HOST}
+ENV KONG_PG_PORT=${KONG_PG_PORT}
+ENV KONG_PG_USER=${KONG_PG_USER}
+ENV KONG_PG_PASSWORD=${KONG_PG_PASSWORD}
+ENV KONG_PG_DATABASE=${KONG_PG_DATABASE}
 
-# Expone el puerto de la UI
-EXPOSE 1337
+# Logs a stdout/stderr
+ENV KONG_PROXY_ACCESS_LOG=/dev/stdout
+ENV KONG_ADMIN_ACCESS_LOG=/dev/stdout
+ENV KONG_PROXY_ERROR_LOG=/dev/stderr
+ENV KONG_ADMIN_ERROR_LOG=/dev/stderr
 
-# Prepara esquema y arranca la app
-ENTRYPOINT ["sh","-c","node ./bin/konga.js prepare --adapter $DB_ADAPTER --uri \"$DB_URI\" && npm run production"]
+# Exponer puertos
+EXPOSE 8000 8443 8001 8444
+
+# Opción A: con entrypoint oficial
+ENTRYPOINT ["sh","-c","kong migrations bootstrap && /docker-entrypoint.sh kong docker-start"]
+
+# — o bien —
+
+# Opción B: sin entrypoint oficial, usando `kong start`
+# ENTRYPOINT ["sh","-c","kong migrations bootstrap && kong start"]
